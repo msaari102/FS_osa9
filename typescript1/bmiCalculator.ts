@@ -22,6 +22,20 @@ const parseArguments = (args: Array<string>): BMIValues => {
   }
 }
 
+const parseHttpBmi = (weight: string, height: string): string => {
+  if (
+    !isNaN(Number(weight)) &&
+    !isNaN(Number(height)) &&
+    Number(weight) > 0 &&
+    Number(height) > 0
+  ) {
+    const result = calculateBmi(Number(weight), Number(height))
+    return result
+  } else {
+    throw new Error('Provided values were not numbers above zero!')
+  }
+}
+
 const calculateBmi = (a: number, b: number): string => {
   const bmi = b / (a / 100) / (a / 100)
   if (bmi < 16) return 'Underweight (Severe thinness)'
@@ -44,3 +58,5 @@ try {
   }
   console.log(errorMessage)
 }
+
+export { parseHttpBmi }
