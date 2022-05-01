@@ -4,8 +4,8 @@ interface BMIValues {
 }
 
 const parseArguments = (args: Array<string>): BMIValues => {
-  if (args.length < 4) throw new Error('Not enough arguments')
-  if (args.length > 4) throw new Error('Too many arguments')
+  if (args.length < 4) throw new Error('Not enough arguments');
+  if (args.length > 4) throw new Error('Too many arguments');
 
   if (
     !isNaN(Number(args[2])) &&
@@ -16,11 +16,11 @@ const parseArguments = (args: Array<string>): BMIValues => {
     return {
       value1: Number(args[2]),
       value2: Number(args[3]),
-    }
+    };
   } else {
-    throw new Error('Provided values were not numbers above zero!')
+    throw new Error('Provided values were not numbers above zero!');
   }
-}
+};
 
 const parseHttpBmi = (weight: string, height: string): string => {
   if (
@@ -29,34 +29,34 @@ const parseHttpBmi = (weight: string, height: string): string => {
     Number(weight) > 0 &&
     Number(height) > 0
   ) {
-    const result = calculateBmi(Number(weight), Number(height))
-    return result
+    const result = calculateBmi(Number(weight), Number(height));
+    return result;
   } else {
-    throw new Error('Provided values were not numbers above zero!')
+    throw new Error('Provided values were not numbers above zero!');
   }
-}
+};
 
 const calculateBmi = (a: number, b: number): string => {
-  const bmi = b / (a / 100) / (a / 100)
-  if (bmi < 16) return 'Underweight (Severe thinness)'
-  else if (bmi < 17) return 'Underweight (Moderate thinness)'
-  else if (bmi < 18.5) return 'Underweight (Mild thinness)'
-  else if (bmi < 25) return 'Normal (healthy weight)'
-  else if (bmi < 30) return 'Overweight (Pre-obese)'
-  else if (bmi < 35) return 'Obese (Class I)'
-  else if (bmi < 40) return 'Obese (Class II)'
-  return 'Obese (Class III)'
-}
+  const bmi = b / (a / 100) / (a / 100);
+  if (bmi < 16) return 'Underweight (Severe thinness)';
+  else if (bmi < 17) return 'Underweight (Moderate thinness)';
+  else if (bmi < 18.5) return 'Underweight (Mild thinness)';
+  else if (bmi < 25) return 'Normal (healthy weight)';
+  else if (bmi < 30) return 'Overweight (Pre-obese)';
+  else if (bmi < 35) return 'Obese (Class I)';
+  else if (bmi < 40) return 'Obese (Class II)';
+  return 'Obese (Class III)';
+};
 
 try {
-  const { value1, value2 } = parseArguments(process.argv)
-  console.log(calculateBmi(value1, value2))
+  const { value1, value2 } = parseArguments(process.argv);
+  console.log(calculateBmi(value1, value2));
 } catch (error: unknown) {
-  let errorMessage = 'Something bad happened.'
+  let errorMessage = 'Something bad happened.';
   if (error instanceof Error) {
-    errorMessage += ' Error: ' + error.message
+    errorMessage += ' Error: ' + error.message;
   }
-  console.log(errorMessage)
+  console.log(errorMessage);
 }
 
-export { parseHttpBmi }
+export { parseHttpBmi };
