@@ -4,7 +4,8 @@ Content-Type: application/json
 {
     "name" : "nimi",
     "dateOfBirth": "syntyma-aika",
-    "gender": "sukupuoli",
+    "gender": "female",
     "occupation": "ammatti",
-    "ssn": "1"
+    "ssn": "1",
+    "entries": []
 }

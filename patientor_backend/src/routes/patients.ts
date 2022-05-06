@@ -7,6 +7,18 @@ router.get('/', (_req, res) => {
   res.send(patientService.getNonSensitiveEntries());
 });
 
+
+router.get('/:id', (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const patient = patientService.findById(String(req.params.id));
+  if (patient) {
+    res.send(patient);
+  } else {
+    res.sendStatus(404);
+  }
+});
+
+
 router.post('/', (req, res) => {
   try {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -21,3 +33,4 @@ router.post('/', (req, res) => {
 });
 
 export default router;
+
