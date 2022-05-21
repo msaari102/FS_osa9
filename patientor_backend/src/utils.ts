@@ -46,9 +46,7 @@ const parseOccupation = (comment: unknown): string => {
 };
 
 const parseEntries = (entries: string[]): string[] => {
-  if (!entries) {
-    throw new Error('Incorrect or missing entry');
-  } else {
+  if (entries) {
     entries.forEach(element => {
       if (!isString(element)) {
         throw new Error('Incorrect or missing entry');
