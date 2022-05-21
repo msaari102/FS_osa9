@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 import { Box, Table, TableHead, Typography } from "@material-ui/core";
-import { useStateValue } from "../state";
+import { useStateValue, updatePatient } from "../state";
 import { TableCell } from "@material-ui/core";
 import { TableRow } from "@material-ui/core";
 import { TableBody } from "@material-ui/core";
@@ -19,7 +19,8 @@ const PatientViewPage = () => {
       const { data: patientFromApi } = await axios.get<Patient>(
         `${apiBaseUrl}/patients/${idx}`
       );
-      dispatch({ type: "UPDATE_PATIENT", payload: patientFromApi });
+      //dispatch({ type: "UPDATE_PATIENT", payload: patientFromApi });
+      dispatch(updatePatient(patientFromApi));
     } catch (e) {
       console.error(e);
     }
