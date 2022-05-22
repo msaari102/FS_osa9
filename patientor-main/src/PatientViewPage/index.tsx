@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Box, Table, TableHead, Typography } from "@material-ui/core";
 import { useStateValue, updatePatient } from "../state";
@@ -7,10 +7,11 @@ import { TableRow } from "@material-ui/core";
 import { TableBody } from "@material-ui/core";
 import { useParams } from 'react-router-dom';
 import { apiBaseUrl } from "../constants";
-import { Patient, Entry } from "../types";
+import { Patient, Entry, Diagnosis } from "../types";
 
 const PatientViewPage = () => {
   const [{ patients }, dispatch] = useStateValue();
+  const [diagnoses, setDiagnoses] = useState<Diagnosis[]>([]);
   const { id } = useParams<{ id: string }>();
   const idx = id || "";
 
@@ -26,6 +27,16 @@ const PatientViewPage = () => {
     }
   };
 
+  useEffect(() => {
+    axios
+    .get<Diagnosis[]>(`${apiBaseUrl}/diagnoses`)
+      .then(response => {
+        setDiagnoses(response.data);
+      }).catch(error => {
+        console.log(error);
+      });
+  }, []);
+
   if (!patients[idx]) return null;
 
   if (!patients[idx].ssn) {
@@ -33,6 +44,8 @@ const PatientViewPage = () => {
   }
 
   const patient = patients[idx];
+
+  console.log(diagnoses);
 
   return (
     <div className="App">
@@ -63,7 +76,7 @@ const PatientViewPage = () => {
       <ul>{Object.values(patient.entries ||[]).map((entry: Entry) => (
         <li key={entry.id}>
           {entry.date} <i>{entry.description}</i>
-          {Object.values(entry.diagnosisCodes||[]).map((code: string) => (<div key={code}>{code}</div>))}
+          {Object.values(entry.diagnosisCodes||[]).map((code: string) => (<div key={code}>{code} {diagnoses.find(element => element.code === code)?.name}</div>))}
         </li>
       ))}</ul>
     </div>
