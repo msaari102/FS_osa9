@@ -7,7 +7,7 @@ import { TableRow } from "@material-ui/core";
 import { TableBody } from "@material-ui/core";
 import { useParams } from 'react-router-dom';
 import { apiBaseUrl } from "../constants";
-import { Patient } from "../types";
+import { Patient, Entry } from "../types";
 
 const PatientViewPage = () => {
   const [{ patients }, dispatch] = useStateValue();
@@ -32,6 +32,8 @@ const PatientViewPage = () => {
     void fetchPatient();
   }
 
+  const patient = patients[idx];
+
   return (
     <div className="App">
       <Box>
@@ -49,18 +51,34 @@ const PatientViewPage = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-        {Object.values(patients).filter(patient => patient.id === idx).map((patient: Patient) => (
         <TableRow key={patient.id}>
-              <TableCell>{patient.name}</TableCell>
-              <TableCell>{patient.gender}</TableCell>
-              <TableCell>{patient.occupation}</TableCell>
-              <TableCell>{patient.ssn}</TableCell>
-            </TableRow>
-            ))}
+            <TableCell>{patient.name}</TableCell>
+            <TableCell>{patient.gender}</TableCell>
+            <TableCell>{patient.occupation}</TableCell>
+            <TableCell>{patient.ssn}</TableCell>
+            <TableCell>{}</TableCell>
+        </TableRow>
         </TableBody>
       </Table>
+      <ul>{Object.values(patient.entries ||[]).map((entry: Entry) => (
+        <li key={entry.id}>
+          {entry.date} <i>{entry.description}</i>
+          {Object.values(entry.diagnosisCodes||[]).map((code: string) => (<div key={code}>{code}</div>))}
+        </li>
+      ))}</ul>
     </div>
   );
 };
 
 export default PatientViewPage;
+
+
+/*
+            {Object.values(patient.entries).map((entry: Entry) => (
+                      <TableRow key={entry.id}>
+                      <TableCell>{entry.date}</TableCell>
+                      <TableCell>{entry.description }</TableCell>
+                      <TableCell>{entry.diagnosisCodes}</TableCell>
+                    </TableRow>
+            ))}
+            */
