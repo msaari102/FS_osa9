@@ -8,6 +8,13 @@ import { TableBody } from "@material-ui/core";
 import { useParams } from 'react-router-dom';
 import { apiBaseUrl } from "../constants";
 import { Patient, Entry, Diagnosis } from "../types";
+import HealthRatingBar from "../components/HealthRatingBar";
+
+const entryStyle = {  
+  border: "2px solid",  
+  padding: "10px", 
+  margin: "10px",  
+}; 
 
 const PatientViewPage = () => {
   const [{ patients }, dispatch] = useStateValue();
@@ -45,7 +52,36 @@ const PatientViewPage = () => {
 
   const patient = patients[idx];
 
-  console.log(diagnoses);
+  const EntryDetails: React.FC<{ entry: Entry}> = ({ entry }) => {
+    switch (entry.type) {
+      case "Hospital":
+        return (
+          <div>
+            <p>Hospital</p>
+            <p>Discharge date: {entry.discharge.date}</p>
+            <p>Discharge criteria: {entry.discharge.criteria}</p>
+          </div>
+          );
+      case "OccupationalHealthcare":
+        return (
+          <div>
+            <p>Occupational healthcare</p>
+            <p>Employer: {entry.employerName}</p>
+            <p>Sickleave start date: {entry.sickLeave?.startDate}</p>
+            <p>Sickleave end date: {entry.sickLeave?.endDate}</p>
+          </div>
+          );
+      case "HealthCheck":
+        return (
+          <div>
+            <p>Health check</p>
+            <HealthRatingBar showText={true} rating={entry.healthCheckRating} />
+          </div>
+          );
+      default:
+        return assertNever(entry);
+    }
+  };
 
   return (
     <div className="App">
@@ -73,25 +109,26 @@ const PatientViewPage = () => {
         </TableRow>
         </TableBody>
       </Table>
-      <ul>{Object.values(patient.entries ||[]).map((entry: Entry) => (
-        <li key={entry.id}>
-          {entry.date} <i>{entry.description}</i>
-          {Object.values(entry.diagnosisCodes||[]).map((code: string) => (<div key={code}>{code} {diagnoses.find(element => element.code === code)?.name}</div>))}
-        </li>
-      ))}</ul>
+      {Object.values(patient.entries ||[]).map((entry: Entry) => (
+        <Box key={entry.id} style={entryStyle}>
+          <p>{entry.date}</p> 
+          <i>{entry.description}</i>
+          <ul>
+            {Object.values(entry.diagnosisCodes||[]).map((code: string) => (<li key={code}>{code} {diagnoses.find(element => element.code === code)?.name}</li>))}
+          </ul>
+          <EntryDetails entry={entry} />
+          <p>diagnosed by {entry.specialist} </p>
+        </Box>
+      ))}
+      
     </div>
   );
 };
 
 export default PatientViewPage;
 
-
-/*
-            {Object.values(patient.entries).map((entry: Entry) => (
-                      <TableRow key={entry.id}>
-                      <TableCell>{entry.date}</TableCell>
-                      <TableCell>{entry.description }</TableCell>
-                      <TableCell>{entry.diagnosisCodes}</TableCell>
-                    </TableRow>
-            ))}
-            */
+const assertNever = (value: never): never => {
+  throw new Error(
+    `Unhandled discriminated union member: ${JSON.stringify(value)}`
+  );
+};
