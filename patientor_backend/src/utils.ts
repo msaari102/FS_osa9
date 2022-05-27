@@ -9,16 +9,16 @@ const isGender = (param: any): param is Gender => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   return Object.values(Gender).includes(param);
 };
-/*
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const isHCRType = (param: any): param is HealthCheckRating => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   return Object.values(HealthCheckRating).includes(param);
-};*/
+};
 
-const parseString = (element: unknown): string => {
+const parseString = (element: unknown, type: string): string => {
   if (!element || !isString(element)) {
-    throw new Error('Incorrect or missing entry field');
+    throw new Error('Incorrect or missing ' + type);
   }
   return element;
 };
@@ -79,25 +79,25 @@ const parseEntries = (entries: unknown[]): Entry[] => {
   return returnEntries;
 };
 
-/*const parseHCR = (type: unknown): HealthCheckRating => {
-  if (!type || !isHCRType(type)) {
+const parseHCR = (type: unknown): HealthCheckRating => {
+  if (!isHCRType(type)) {
     throw new Error('Incorrect or missing healthcheck rating');
   }
   return type;
-};*/
+};
 
 type Fields = { name : unknown, ssn: unknown, dateOfBirth: unknown, gender: unknown, occupation: unknown, entries: unknown[] };
 type EntryFields = { id : unknown, description: unknown, date: unknown, specialist: unknown, diagnosisCodes?: unknown[], type: unknown, healthCheckRating?: unknown, discharge?: unknown, sickLeave?: unknown, employerName?: unknown };
 
-const toEntry = ({ id, description, date, specialist, diagnosisCodes, type, healthCheckRating, discharge, sickLeave, employerName } : EntryFields): Entry => {
+export const toEntry = ({ id, description, date, specialist, diagnosisCodes, type, healthCheckRating, discharge, sickLeave, employerName } : EntryFields): Entry => {
   let newEntry: Entry;
   switch (type) {
     case "Hospital":
       newEntry = {
-        id: parseString(id),
-        description: parseString(description),
-        date: parseString(date),
-        specialist: parseString(specialist),
+        id: parseString(id, "id"),
+        description: parseString(description, "description"),
+        date: parseString(date, "date"),
+        specialist: parseString(specialist, "specialist"),
         diagnosisCodes: parseStrings(diagnosisCodes),
         type: "Hospital",
         discharge: discharge as {date: string, criteria: string},
@@ -105,25 +105,25 @@ const toEntry = ({ id, description, date, specialist, diagnosisCodes, type, heal
       break;
     case "HealthCheck":  
       newEntry = {
-        id: parseString(id),
-        description: parseString(description),
-        date: parseString(date),
-        specialist: parseString(specialist),
+        id: parseString(id, "id"),
+        description: parseString(description, "description"),
+        date: parseString(date, "date"),
+        specialist: parseString(specialist, "specialist"),
         diagnosisCodes: parseStrings(diagnosisCodes),
         type: "HealthCheck",
-        healthCheckRating: healthCheckRating as HealthCheckRating,
+        healthCheckRating: parseHCR(healthCheckRating),
       };
       break;
     case "OccupationalHealthcare":  
       newEntry = {
-        id: parseString(id),
-        description: parseString(description),
-        date: parseString(date),
-        specialist: parseString(specialist),
+        id: parseString(id, "id"),
+        description: parseString(description, "description"),
+        date: parseString(date, "date"),
+        specialist: parseString(specialist, "specialist"),
         diagnosisCodes: parseStrings(diagnosisCodes),
         type: "OccupationalHealthcare",
         sickLeave: sickLeave as {startDate: string, endDate: string},
-        employerName : parseString(employerName),
+        employerName : parseString(employerName, "employer name"),
       };
       break;
       default: throw new Error('Incorrect or missing entry type');
