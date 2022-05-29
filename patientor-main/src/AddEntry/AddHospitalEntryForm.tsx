@@ -1,10 +1,9 @@
 import React from "react";
 import { Grid, Button } from "@material-ui/core";
-import { Field, Formik, Form, FieldProps } from "formik";
-import { Select, MenuItem } from "@material-ui/core";
+import { Field, Formik, Form } from "formik";
 
 import { TextField, DiagnosisSelection } from "../AddPatientModal/FormField";
-import { Entry, HealthCheckRating } from "../types";
+import { Entry } from "../types";
 import { useStateValue } from "../state";
 
 // Define special omit for unions
@@ -21,26 +20,17 @@ interface Props {
   onCancel: () => void;
 }
 
-const FormikSelect = ({ field, ...props }: FieldProps) => <Select {...field} {...props} />;
-
-const healthCheckRatingOptions: {value: HealthCheckRating; label: string;}[] = [
-  { value: 0, label: "Healthy" },
-  { value: 1, label: "LowRisk" },
-  { value: 2, label: "HighRisk" },
-  { value: 3, label: "CriticalRisk" },
-];
-
-export const AddEntryForm = ({ onSubmit, onCancel }: Props) => {
+export const AddHospitalEntryForm = ({ onSubmit, onCancel }: Props) => {
   const [{ diagnoses }] = useStateValue();
   return (
     <Formik
       initialValues={{
-        type: "HealthCheck",
+        type: "Hospital",
         description: "",
         date: "",
         specialist: "",
         diagnosisCodes: [],
-        healthCheckRating: 0
+        discharge: {date: "", criteria: ""},
       }}
       onSubmit={onSubmit}
       validate={(values) => {
@@ -69,6 +59,12 @@ export const AddEntryForm = ({ onSubmit, onCancel }: Props) => {
               component={TextField}
             />
             <Field
+              label="Date"
+              placeholder="Date"
+              name="date"
+              component={TextField}
+            />
+            <Field
               label="Specialist"
               placeholder="Specialist"
               name="specialist"
@@ -86,24 +82,17 @@ export const AddEntryForm = ({ onSubmit, onCancel }: Props) => {
             diagnoses={Object.values(diagnoses)}
           />
             <Field
-              label="Date"
+              label="Discharge date"
               placeholder="Date"
-              name="date"
+              name="discharge.date"
               component={TextField}
             />
             <Field
-              fullWidth
-              style={{ marginBottom: "0.5em" }}
-              label="Health Check Rating"
-              component={FormikSelect}
-              name="healthCheckRating"
-            >
-              {healthCheckRatingOptions.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label || option.value}
-                </MenuItem>
-              ))}
-            </Field>
+              label="Dischage criteria"
+              placeholder="Criteria"
+              name="discharge.criteria"
+              component={TextField}
+            />
             <Grid>
               <Grid item>
                 <Button
@@ -136,4 +125,4 @@ export const AddEntryForm = ({ onSubmit, onCancel }: Props) => {
   );
 };
 
-export default AddEntryForm;
+export default AddHospitalEntryForm;

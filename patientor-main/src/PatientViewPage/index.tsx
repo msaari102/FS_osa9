@@ -9,8 +9,8 @@ import { useParams } from 'react-router-dom';
 import { apiBaseUrl } from "../constants";
 import { Patient, Entry } from "../types";
 import HealthRatingBar from "../components/HealthRatingBar";
-import AddEntryModal from "../AddEntry/index";
-import { EntryFormValues } from "../AddEntry/AddEntryForm";
+import AddHealthCheckEntryModal, { AddHospitalEntryModal, AddOccupationalHealthcareEntryModal} from "../AddEntry/index";
+import { EntryFormValues } from "../AddEntry/AddHealthCheckEntryForm";
 
 const entryStyle = {  
   border: "2px solid",  
@@ -52,6 +52,8 @@ const EntryDetails: React.FC<{ entry: Entry}> = ({ entry }) => {
 const PatientViewPage = () => {
   const [{ patients, diagnoses }, dispatch] = useStateValue();
   const [modalOpen, setModalOpen] = React.useState<boolean>(false);
+  const [modalOpen2, setModalOpen2] = React.useState<boolean>(false);
+  const [modalOpen3, setModalOpen3] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string>();
   const { id } = useParams<{ id: string }>();
   const idx = id || "";
@@ -77,9 +79,13 @@ const PatientViewPage = () => {
   const patient = patients[idx];
 
   const openModal = (): void => setModalOpen(true);
+  const openModal2 = (): void => setModalOpen2(true);
+  const openModal3 = (): void => setModalOpen3(true);
 
   const closeModal = (): void => {
     setModalOpen(false);
+    setModalOpen2(false);
+    setModalOpen3(false);
     setError(undefined);
   };
 
@@ -141,14 +147,32 @@ const PatientViewPage = () => {
         </Box>
       ))}
       <div>
-      <AddEntryModal
+      <AddHealthCheckEntryModal
         modalOpen={modalOpen}
+        onSubmit={submitNewEntry}
+        error={error}
+        onClose={closeModal}
+      />
+      <AddHospitalEntryModal
+        modalOpen={modalOpen2}
+        onSubmit={submitNewEntry}
+        error={error}
+        onClose={closeModal}
+      />
+      <AddOccupationalHealthcareEntryModal
+        modalOpen={modalOpen3}
         onSubmit={submitNewEntry}
         error={error}
         onClose={closeModal}
       />
       <Button variant="contained" onClick={() => openModal()}>
         Add New Healthcheck Entry
+      </Button>
+      <Button variant="contained" onClick={() => openModal2()}>
+        Add New Hospital Entry
+      </Button>
+      <Button variant="contained" onClick={() => openModal3()}>
+        Add New Occupational Healthcare Entry
       </Button>
       </div>
     </div>
