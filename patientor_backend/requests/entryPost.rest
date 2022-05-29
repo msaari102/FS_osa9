@@ -5,6 +5,7 @@ Content-Type: application/json
     "description": "syntyma-aika",
     "date": "female",
     "specialist": "ammatti",
-    "type": "Hospital",
-    "healthCheckRating": 3
+    "type": "OccupationalHealthcare",
+    "employerName": "fbi",
+    "discharge": {"date": "1.1.2011", "criteria": "healty"}
 }

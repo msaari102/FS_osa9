@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Box, Table, TableHead, Typography } from "@material-ui/core";
+import React from "react";
+import { Box, Button, Table, TableHead, Typography } from "@material-ui/core";
 import { useStateValue, updatePatient } from "../state";
 import { TableCell } from "@material-ui/core";
 import { TableRow } from "@material-ui/core";
 import { TableBody } from "@material-ui/core";
 import { useParams } from 'react-router-dom';
 import { apiBaseUrl } from "../constants";
-import { Patient, Entry, Diagnosis } from "../types";
+import { Patient, Entry } from "../types";
 import HealthRatingBar from "../components/HealthRatingBar";
+import AddEntryModal from "../AddEntry/index";
+import { EntryFormValues } from "../AddEntry/AddEntryForm";
 
 const entryStyle = {  
   border: "2px solid",  
@@ -16,9 +18,41 @@ const entryStyle = {
   margin: "10px",  
 }; 
 
+const EntryDetails: React.FC<{ entry: Entry}> = ({ entry }) => {
+  switch (entry.type) {
+    case "Hospital":
+      return (
+        <div>
+          <p>Hospital</p>
+          <p>Discharge date: {entry.discharge.date}</p>
+          <p>Discharge criteria: {entry.discharge.criteria}</p>
+        </div>
+        );
+    case "OccupationalHealthcare":
+      return (
+        <div>
+          <p>Occupational healthcare</p>
+          <p>Employer: {entry.employerName}</p>
+          <p>Sickleave start date: {entry.sickLeave?.startDate}</p>
+          <p>Sickleave end date: {entry.sickLeave?.endDate}</p>
+        </div>
+        );
+    case "HealthCheck":
+      return (
+        <div>
+          <p>Health check</p>
+          <HealthRatingBar showText={true} rating={entry.healthCheckRating} />
+        </div>
+        );
+    default:
+      return assertNever(entry);
+  }
+};
+
 const PatientViewPage = () => {
-  const [{ patients }, dispatch] = useStateValue();
-  const [diagnoses, setDiagnoses] = useState<Diagnosis[]>([]);
+  const [{ patients, diagnoses }, dispatch] = useStateValue();
+  const [modalOpen, setModalOpen] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<string>();
   const { id } = useParams<{ id: string }>();
   const idx = id || "";
 
@@ -34,16 +68,6 @@ const PatientViewPage = () => {
     }
   };
 
-  useEffect(() => {
-    axios
-    .get<Diagnosis[]>(`${apiBaseUrl}/diagnoses`)
-      .then(response => {
-        setDiagnoses(response.data);
-      }).catch(error => {
-        console.log(error);
-      });
-  }, []);
-
   if (!patients[idx]) return null;
 
   if (!patients[idx].ssn) {
@@ -52,34 +76,30 @@ const PatientViewPage = () => {
 
   const patient = patients[idx];
 
-  const EntryDetails: React.FC<{ entry: Entry}> = ({ entry }) => {
-    switch (entry.type) {
-      case "Hospital":
-        return (
-          <div>
-            <p>Hospital</p>
-            <p>Discharge date: {entry.discharge.date}</p>
-            <p>Discharge criteria: {entry.discharge.criteria}</p>
-          </div>
-          );
-      case "OccupationalHealthcare":
-        return (
-          <div>
-            <p>Occupational healthcare</p>
-            <p>Employer: {entry.employerName}</p>
-            <p>Sickleave start date: {entry.sickLeave?.startDate}</p>
-            <p>Sickleave end date: {entry.sickLeave?.endDate}</p>
-          </div>
-          );
-      case "HealthCheck":
-        return (
-          <div>
-            <p>Health check</p>
-            <HealthRatingBar showText={true} rating={entry.healthCheckRating} />
-          </div>
-          );
-      default:
-        return assertNever(entry);
+  const openModal = (): void => setModalOpen(true);
+
+  const closeModal = (): void => {
+    setModalOpen(false);
+    setError(undefined);
+  };
+
+  const submitNewEntry = async (values: EntryFormValues) => {
+    try {
+      const { data: updatedPatient } = await axios.post<Patient>(
+        `${apiBaseUrl}/patients/${idx}/entries`,
+        values
+      );
+      //dispatch({ type: "ADD_PATIENT", payload: newPatient });
+      dispatch(updatePatient(updatedPatient));
+      closeModal();
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        console.error(e?.response?.data || "Unrecognized axios error");
+        setError(String(e?.response?.data?.error) || "Unrecognized axios error");
+      } else {
+        console.error("Unknown error", e);
+        setError("Unknown error");
+      }
     }
   };
 
@@ -120,7 +140,17 @@ const PatientViewPage = () => {
           <p>diagnosed by {entry.specialist} </p>
         </Box>
       ))}
-      
+      <div>
+      <AddEntryModal
+        modalOpen={modalOpen}
+        onSubmit={submitNewEntry}
+        error={error}
+        onClose={closeModal}
+      />
+      <Button variant="contained" onClick={() => openModal()}>
+        Add New Healthcheck Entry
+      </Button>
+      </div>
     </div>
   );
 };
