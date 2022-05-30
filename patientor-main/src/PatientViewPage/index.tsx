@@ -50,7 +50,7 @@ const EntryDetails: React.FC<{ entry: Entry}> = ({ entry }) => {
 };
 
 const PatientViewPage = () => {
-  const [{ patients, diagnoses }, dispatch] = useStateValue();
+  const [{ patientInfo, diagnoses }, dispatch] = useStateValue();
   const [modalOpen, setModalOpen] = React.useState<boolean>(false);
   const [modalOpen2, setModalOpen2] = React.useState<boolean>(false);
   const [modalOpen3, setModalOpen3] = React.useState<boolean>(false);
@@ -58,25 +58,25 @@ const PatientViewPage = () => {
   const { id } = useParams<{ id: string }>();
   const idx = id || "";
 
-  const fetchPatient = async () => {
-    try {
-      const { data: patientFromApi } = await axios.get<Patient>(
-        `${apiBaseUrl}/patients/${idx}`
-      );
-      //dispatch({ type: "UPDATE_PATIENT", payload: patientFromApi });
-      dispatch(updatePatient(patientFromApi));
-    } catch (e) {
-      console.error(e);
+  React.useEffect(() => {
+    const fetchPatient = async () => {
+      try {
+        const { data: patientFromApi } = await axios.get<Patient>(
+          `${apiBaseUrl}/patients/${idx}`
+        );
+        dispatch(updatePatient(patientFromApi));
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    if (!patientInfo[idx]) {
+      void fetchPatient();
     }
-  };
+  }, []);
 
-  if (!patients[idx]) return null;
+  if (!patientInfo[idx]) return null;
 
-  if (!patients[idx].ssn) {
-    void fetchPatient();
-  }
-
-  const patient = patients[idx];
+  const patient = patientInfo[idx];
 
   const openModal = (): void => setModalOpen(true);
   const openModal2 = (): void => setModalOpen2(true);

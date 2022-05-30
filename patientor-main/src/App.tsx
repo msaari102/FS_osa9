@@ -27,7 +27,10 @@ const App = () => {
         console.error(e);
       }
     };
+    void fetchPatientList();
+  }, [dispatch]);
 
+  React.useEffect(() => {
     const fetchDiagnosisList = async () => {
       try {
         const { data: diagnosisListFromApi } = await axios.get<Diagnosis[]>(
@@ -38,10 +41,8 @@ const App = () => {
         console.error(e);
       }
     };
-
-    void fetchPatientList();
     void fetchDiagnosisList();
-  }, [dispatch]);
+  }, []);
 
   return (
     <div className="App">

@@ -74,12 +74,6 @@ export const AddHealthCheckEntryForm = ({ onSubmit, onCancel }: Props) => {
               name="specialist"
               component={TextField}
             />
-            <Field
-              label="diagnosisCodes"
-              placeholder="Diagnosis Codes"
-              name="diagnosisCodes"
-              component={TextField}
-            />
             <DiagnosisSelection
             setFieldValue={setFieldValue}
             setFieldTouched={setFieldTouched}
